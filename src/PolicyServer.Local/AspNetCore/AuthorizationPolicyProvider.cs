@@ -2,11 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
-using PolicyServer.Client;
 
-namespace Microsoft.AspNetCore.Authorization
+namespace PolicyServer.Runtime.Client.AspNetCore
 {
     /// <summary>
     /// Authorization policy provider to automatically turn all permissions of a user into a ASP.NET Core authorization policy
@@ -14,24 +13,13 @@ namespace Microsoft.AspNetCore.Authorization
     /// <seealso cref="Microsoft.AspNetCore.Authorization.DefaultAuthorizationPolicyProvider" />
     public class AuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
     {
-        private readonly IPolicyServerClient _client;
-        private readonly IHttpContextAccessor _contextAccessor;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthorizationPolicyProvider"/> class.
         /// </summary>
         /// <param name="options">The options.</param>
-        /// <param name="client">The client.</param>
-        /// <param name="contextAccessor">The context accessor.</param>
-        public AuthorizationPolicyProvider(
-            IOptions<AuthorizationOptions> options,
-            IPolicyServerClient client,
-            IHttpContextAccessor contextAccessor) : base(options)
+        public AuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) : base(options)
         {
-            _client = client;
-            _contextAccessor = contextAccessor;
         }
-
 
         /// <summary>
         /// Gets a <see cref="T:Microsoft.AspNetCore.Authorization.AuthorizationPolicy" /> from the given <paramref name="policyName" />
@@ -67,9 +55,9 @@ namespace Microsoft.AspNetCore.Authorization
 
     internal class PermissionHandler : AuthorizationHandler<PermissionRequirement>
     {
-        private readonly IPolicyServerClient _client;
+        private readonly IPolicyServerRuntimeClient _client;
 
-        public PermissionHandler(IPolicyServerClient client)
+        public PermissionHandler(IPolicyServerRuntimeClient client)
         {
             _client = client;
         }
